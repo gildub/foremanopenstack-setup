@@ -1,0 +1,46 @@
+{
+    "host": {
+	"name": "foreman.example.org",
+	"user": "admin",
+	"passwd": "changeme"
+    },
+    "proxy": {
+	"name": "proxy1",
+	"host": "foreman.example.org"
+    },
+    "globals": {
+	"admin_email":            "admin@example.org",
+	"admin_password":         "changeme",
+	"controller_node_public": "10.100.0.2",
+	"fixed_network_range":    "10.100.10.0/24",
+	"floating_network_range": "8.21.28.128/25",
+	"glance_db_password":     "changeme",
+	"glance_user_password":   "changeme",
+	"horizon_secret_key":     "secret",
+	"keystone_admin_token":   "secret",
+	"keystone_db_password":   "changeme",
+	"mysql_root_password":    "changeme",
+	"nova_db_password":       "changeme",
+	"nova_user_password":     "changeme",
+	"private_interface":      "em1",
+	"public_interface":       "em2",
+	"verbose":                "true"
+    },
+    "hostgroups": {
+	"OpenStack Controller": {
+	    "environment": "production",
+	    "puppetclasses": [
+                "ntp",
+		"trystack::controller"
+	    ]
+	},
+	"OpenStack Nova Compute": {
+		"environment": "production",
+		"puppetclasses": [
+                    "ntp",
+		    "trystack::compute",
+		    "trystack::swift_storage"
+		]
+	}
+    }
+}
