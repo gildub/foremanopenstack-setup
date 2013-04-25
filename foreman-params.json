@@ -30,17 +30,14 @@
 	"OpenStack Controller": {
 	    "environment": "production",
 	    "puppetclasses": [
-                "ntp",
 		"trystack::controller"
 	    ]
 	},
 	"OpenStack Nova Compute": {
-		"environment": "production",
-		"puppetclasses": [
-                    "ntp",
-		    "trystack::compute",
-		    "trystack::swift_storage"
-		]
+	    "environment": "production",
+	    "puppetclasses": [
+		"trystack::compute"
+	    ]
 	}
     }
 }
