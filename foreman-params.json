@@ -6,7 +6,7 @@
     },
     "proxy": {
 	"name": "proxy1",
-	"host": "foreman.example.org"
+	"host": "https://foreman.example.org:8443"
     },
     "globals": {
 	"admin_email":            "admin@example.org",

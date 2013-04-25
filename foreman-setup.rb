@@ -1,11 +1,11 @@
 #!/usr/bin/env ruby
+#TODO: Use foreman-api gem
+require 'rubygems'
 require 'json'
 require 'logger' 
 require 'rest-client'
-require 'rubygems'
 
-#TODO: Use foreman-api gem
-
+# Default
 @params_file_name = 'foreman-params.json'
 @log_file         = STDOUT
 
@@ -46,8 +46,7 @@ end
 
 def create_proxy(proxy)
   raise 'Incorrect or missing Proxy definitions' unless param?('proxy')
-  proxy_url = 'https://' + proxy['host'] + ':8443'
-  data = { :smart_proxy => { :name => proxy['name'], :url => proxy_url}}
+  data = { :smart_proxy => { :name => proxy['name'], :url => proxy['host'] } }
   create('smart_proxies', data)
 end
 
@@ -64,7 +63,6 @@ def create_hostgroups(hostgroups)
   hostgroups.each do |hostgroup| 
     env_id      = get_env_id(hostgroup[1]['environment'])
     classes_ids = get_class_ids(hostgroup[1]['puppetclasses'])
-
     create('hostgroups', :hostgroup => {
              :name => hostgroup[0],
              :environment_id => env_id,
@@ -73,14 +71,21 @@ def create_hostgroups(hostgroups)
   end
 end
 
+def create_puppetos(puppetos)
+  raise 'Incorrect or missing Puppet Modules definitions' unless puppetos
+  puppetos.each do |e|
+    options = e['options'] if e.has_key?('options') && !e['options'].empty? 
+    puts "git clone #{options} #{e['source']} #{e['destination']}"
+  end  
+end
+
 def usage
   puts "Usage: #{File.basename($0)} proxy | globals | hostgroups"
   puts " Multiple commands can be used at same time"
   exit
 end
 
-begin
-# Init
+def init
   # Logs
   @log = Logger.new(@log_file)
   @log.datetime_format = "%d/%m/%Y %H:%M:%S" 
@@ -97,9 +102,27 @@ begin
                                      :user => @params['host']['user'],
                                      :password => @params['host']['passwd'],
                                      :headers => { :accept => :json })
-# Main
+end
+
+begin
+  # Options
   usage unless ARGV[0]
-  while ARGV[0]
+  until ARGV[0] !~ /^-./
+    case ARGV[0]
+    when '-c', '--config-file=' 
+      ARGV.shift
+      @params_file_name = ARGV[0]
+    when '-l', '--log-file='
+      ARGV.shift
+      @log_file         = ARGV[0]
+    end
+    ARGV.shift
+  end
+  init
+
+  # Command
+  usage unless ARGV[0]
+  until ARGV.empty?
     case ARGV[0]
     when 'proxy' 
       create_proxy(@params['proxy'])
