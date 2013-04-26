@@ -30,13 +30,13 @@
 	"OpenStack Controller": {
 	    "environment": "production",
 	    "puppetclasses": [
-		"trystack::controller"
+		"fostack::controller"
 	    ]
 	},
 	"OpenStack Nova Compute": {
 	    "environment": "production",
 	    "puppetclasses": [
-		"trystack::compute"
+		"fostack::compute"
 	    ]
 	}
     }
