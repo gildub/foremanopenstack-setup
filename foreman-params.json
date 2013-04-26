@@ -26,6 +26,18 @@
 	"public_interface":       "em2",
 	"verbose":                "true"
     },
+    "modules": [ 
+	{
+	    "source": "https://github.com/gildub/puppet-openstack.git",
+	    "target": "/etc/puppet/modules/production",
+	    "options": "--recursive"
+	},
+	{
+	    "source": "https://github.com/gildub/openstack-deploy.git",
+	    "target": "/etc/puppet/modules/production/fostack",
+	    "options": ""
+	}
+    ],
     "hostgroups": {
 	"OpenStack Controller": {
 	    "environment": "production",

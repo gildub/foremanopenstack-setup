@@ -71,17 +71,26 @@ def create_hostgroups(hostgroups)
   end
 end
 
-def create_puppetos(puppetos)
-  raise 'Incorrect or missing Puppet Modules definitions' unless puppetos
-  puppetos.each do |e|
-    options = e['options'] if e.has_key?('options') && !e['options'].empty? 
-    puts "git clone #{options} #{e['source']} #{e['destination']}"
-  end  
+# TODO: replace with ssh commands for remote install
+def import_modules(modules)
+  # Clone Git repos
+  raise 'Incorrect or missing Puppet Modules definitions' unless modules
+  modules.each do |mod|
+    options = mod['options'] if mod.has_key?('options') && !mod['options'].empty? 
+    command="git clone #{options} #{mod['source']} #{mod['target']}"
+    system(command)
+    raise "Error with git clone #{command}" if $?.exitstatus != 0
+    @log.info("Git Clone Ok: #{mod['source']}")
+  end
+
+  # Import puppet modules into Foreman 
+  command="cd /usr/share/foreman && rake puppet:import:puppet_classes[batch] RAILS_ENV=production"
+  system(command)
+  @log.info('Import puppet classes ok')
 end
 
 def usage
-  puts "Usage: #{File.basename($0)} proxy | globals | hostgroups"
-  puts " Multiple commands can be used at same time"
+  puts "Usage: #{File.basename($0)} all | proxy | modules | globals | hostgroups"
   exit
 end
 
@@ -104,15 +113,23 @@ def init
                                      :headers => { :accept => :json })
 end
 
+def all(params)
+  # Order matters!
+  create_proxy(params['proxy'])
+  import_modules(params['modules'])
+  create_globals(params['globals'])
+  create_hostgroups(params['hostgroups'])
+end
+
 begin
   # Options
   usage unless ARGV[0]
   until ARGV[0] !~ /^-./
     case ARGV[0]
-    when '-c', '--config-file=' 
+    when '-c' 
       ARGV.shift
       @params_file_name = ARGV[0]
-    when '-l', '--log-file='
+    when '-l'
       ARGV.shift
       @log_file         = ARGV[0]
     end
@@ -126,10 +143,14 @@ begin
     case ARGV[0]
     when 'proxy' 
       create_proxy(@params['proxy'])
+    when 'modules'
+      import_modules(@params['classes'])
     when 'globals' 
       create_globals(@params['globals'])
     when 'hostgroups'
       create_hostgroups(@params['hostgroups'])
+    when 'all'
+      all(@params)
     else
       usage
     end
