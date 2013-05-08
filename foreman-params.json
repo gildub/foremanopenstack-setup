@@ -32,14 +32,9 @@
     },
     "modules": [ 
 	{
-	    "source": "https://github.com/gildub/puppet-openstack.git",
+	    "source": "https://github.com/gildub/puppet-openstack-folsom.git",
 	    "target": "/etc/puppet/modules/production",
 	    "options": "--recursive"
-	},
-	{
-	    "source": "https://github.com/gildub/openstack-deploy.git",
-	    "target": "/etc/puppet/modules/production/fostack",
-	    "options": ""
 	}
     ],
     "hostgroups": {
